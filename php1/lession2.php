@@ -193,7 +193,7 @@ function time2($hour, $min) {
     if ($min == 1 ) {
        $m = "минута"; 
     }
-    elseif ($min == 2|| $min == 3 || $min == 4){
+    elseif ($min == 2 || $min == 3 || $min == 4){
         $m = "минуты"; 
     } 
     else {
