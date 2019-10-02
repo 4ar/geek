@@ -70,17 +70,17 @@ $b1->foo(); // 2
 
 
 // Задание 7
-    class A {
+    class A1 {
         public function foo() {
         static $x = 0;
         echo ++$x;
         }
     }
 
-class B extends A {}
+class B1 extends A1 {}
 
-$a1 = new A;
-$b1 = new B;
+$a1 = new A1;
+$b1 = new B1;
 $a1->foo(); //1
 $b1->foo(); //1
 $a1->foo(); //2
