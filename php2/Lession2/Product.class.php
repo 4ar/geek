@@ -1,40 +1,58 @@
 <?php
-/*
-
-1. Создать структуру классов ведения товарной номенклатуры.
-а) Есть абстрактный товар.
-б) Есть цифровой товар, штучный физический товар и товар на вес.
-в) У каждого есть метод подсчета финальной стоимости.
-г) У цифрового товара стоимость постоянная – дешевле штучного товара в два раза. У штучного товара обычная стоимость, у весового – в зависимости от продаваемого количества в килограммах. У всех формируется в конечном итоге доход с продаж.
-д) Что можно вынести в абстрактный класс, наследование?
-
-
-*/
 
 abstract class Products {
-    // Название товара
-    private $name;
-    // Закупочная цена
-    private $baseprice;
-    
-    public function setName($name) {
-        $this->name = $name;
-    }
-    public function setBasePrice($baseprice) {
-        $this->baseprice = $baseprice;
-    }
 
-    public function getName() {
-        return $this->name;
-    }
-    public function getBasePrice() {
-        return $this->baseprice;
-    }
+// Название товара
+private $name;
 
+// Процент нацеки 
+private $plusPrice = 25;
 
-    public function __construct($name, $baseprice){
+// Закупочная цена
+private $baseprice = 500;
+
+// Кол-во приобретаемого товара
+private $count;
+
+// Seter Названия товара 
+public function setName($name) {
+    $this->name = $name;
+}
+// Getter Названия товара 
+public function getName() {
+    return $this->name;
+}
+
+// Seter процента нацеки  
+public function setplusPrice($plusPrice) {
+    $this->plusPrice = $plusPrice;
+}
+// Getter процента нацеки 
+public function getplusPrice() {
+    return $this->plusPrice;
+}
+
+// Seter закупочный цены 
+public function setBasePrice($baseprice) {
+    $this->baseprice = $baseprice;
+}
+// Getter закупочный цены 
+public function getBasePrice() {
+    return $this->baseprice;
+}
+
+// Seter кол-ва приобретаемого товара
+public function setCount($count) {
+    $this->count = $count;
+}
+// Seter кол-ва приобретаемого товара
+public function getCount() {
+    return $this->count;
+}
+
+    public function __construct($name){
         $this->setName($name);
-        $this->setBasePrice($baseprice); 
+        
     }
 
     //расчет стомость товара
@@ -49,27 +67,15 @@ abstract class Products {
 }
 
 class Product extends Products {
-    // Кол-во приобретаемого товара
-    private $count;
-
-    // Процент нацеки 
-    private $plusPrice = 25;
-
-    public function setCount($count) {
-        $this->count = $count;
-    }
-
-    public function getCount() {
-        return $this->count;
-    }
-
-    public function __construct($name, $baseprice, $count){
-        parent::__construct($name, $baseprice);
+   
+   
+    public function __construct($name, $count){
+        parent::__construct($name);
         $this->setCount($count);
-    }
+       }
 
     public function shopPrice() {
-        $res = $this->getBasePrice() + ($this->getBasePrice() * $this->plusPrice / 100 );
+        $res = $this->getBasePrice() + ($this->getBasePrice() * $this->getplusPrice() / 100 );
         return $res;
     }
 
@@ -88,27 +94,62 @@ class Product extends Products {
 
 class Digital extends Product {
 
-
-
-}
-
-
-class WeightGoods extends Product {
-    public function shopPrice() {
-        return 1;
+    public function shopDigitalBasePrice() {
+        $res = $this->getBasePrice() / 2;
+        return $res;
     }
 
-    public function shopResult() {
-        return 1;
+    public function shopPrice() {
+        $res = $this->shopDigitalBasePrice() + ($this->shopDigitalBasePrice() * $this->getplusPrice() / 100 );
+        return $res;
     }
 
     public function profit() {
-        return 1;
+        $res = $this->shopResult() - ($this->shopDigitalBasePrice() * $this->getCount());
+        return $res;
+    }
+
+  
+}
+
+
+class WeightGoods extends Products {
+
+    public function setCount($count) {
+        $this->count = $count;
+    }
+
+    public function getCount() {
+        return $this->count;
+    }
+
+    public function __construct($name, $baseprice, $count, $plusPrice){
+        parent::__construct($name);
+        $this->setCount($count);
+        $this->setBasePrice($baseprice);
+        $this->setplusPrice($plusPrice);
+       }
+
+    public function shopPrice() {
+        $res = $this->getBasePrice() + ($this->getBasePrice() * $this->getplusPrice() / 100 );
+        return $res;
+    }
+
+    public function shopResult() {
+        $res = $this->shopPrice() * $this->getCount();
+        return $res;
+    }
+
+    public function profit() {
+        $res = $this->shopResult() - ($this->getBasePrice() * $this->getCount());
+        return $res;
     }
 
 }
 
-$prod = new Product("Моя книга", 500, 4);
+echo "<h1>Штучный товар</h1><br>";
+
+$prod = new Product("Моя книга", 4);
 echo "Наименование товара: " . $prod->getName() . "<br>";
 echo "Кол-во в заказе: " . $prod->getCount() . " шт.<br>";
 echo "Закупочная стоимость товара: " . $prod->getBasePrice() . " р.<br>";
@@ -116,8 +157,28 @@ echo "Розничная стоимость товара: " . $prod->shopPrice()
 echo "Итоговая стоимость заказа: " . $prod->shopResult() . " р.<br>";
 echo "Чистая прибыль: " . $prod->profit() . " р.<br>";
 
+echo "<h1>Цифровой товар </h1><br>";
+
+$prod1 = new Digital("Моя электроная книга",  2); ;
+echo "Наименование товара: " . $prod1->getName() . "<br>";
+echo "Кол-во в заказе: " . $prod1->getCount() . " шт.<br>";
+echo "Закупочная стоимость товара: " . $prod1->shopDigitalBasePrice() . " р.<br>";
+echo "Розничная стоимость товара: " . $prod1->shopPrice() . " р.<br>";
+echo "Итоговая стоимость заказа: " . $prod1->shopResult() . " р.<br>";
+echo "Чистая прибыль: " . $prod1->profit() . " р.<br>";
+
+echo "<h1>Товар  на вес</h1><br>";
+
+$prod2 = new WeightGoods("Мука", 65 ,10, 100);
+echo "Наименование товара: " . $prod2->getName() . "<br>";
+echo "Кол-во в заказе: " . $prod2->getCount() . " кг.<br>";
+echo "Закупочная стоимость товара: " . $prod2->getBasePrice() . " р.<br>";
+echo "Розничная стоимость товара: " . $prod2->shopPrice() . " р.<br>";
+echo "Итоговая стоимость заказа: " . $prod2->shopResult() . " р.<br>";
+echo "Чистая прибыль: " . $prod2->profit() . " р.<br>";
 
 
-//$dig->get();
+
+
 
 
